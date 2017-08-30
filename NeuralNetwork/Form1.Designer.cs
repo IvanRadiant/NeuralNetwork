@@ -32,9 +32,9 @@
             this.InputPictureBox = new System.Windows.Forms.PictureBox();
             this.ImgLoadBtn = new System.Windows.Forms.Button();
             this.GuessBtn = new System.Windows.Forms.Button();
-            this.ResultLabel = new System.Windows.Forms.Label();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.mainTextBox = new System.Windows.Forms.TextBox();
+            this.trainBtn = new System.Windows.Forms.Button();
             this.InputPictureGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.InputPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -81,15 +81,6 @@
             this.GuessBtn.UseVisualStyleBackColor = true;
             this.GuessBtn.Click += new System.EventHandler(this.GuessBtn_Click);
             // 
-            // ResultLabel
-            // 
-            this.ResultLabel.AutoSize = true;
-            this.ResultLabel.Location = new System.Drawing.Point(431, 298);
-            this.ResultLabel.Name = "ResultLabel";
-            this.ResultLabel.Size = new System.Drawing.Size(31, 13);
-            this.ResultLabel.TabIndex = 4;
-            this.ResultLabel.Text = "Итог";
-            // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog";
@@ -103,13 +94,23 @@
             this.mainTextBox.Size = new System.Drawing.Size(307, 210);
             this.mainTextBox.TabIndex = 5;
             // 
+            // trainBtn
+            // 
+            this.trainBtn.Location = new System.Drawing.Point(251, 281);
+            this.trainBtn.Name = "trainBtn";
+            this.trainBtn.Size = new System.Drawing.Size(75, 23);
+            this.trainBtn.TabIndex = 6;
+            this.trainBtn.Text = "Train";
+            this.trainBtn.UseVisualStyleBackColor = true;
+            this.trainBtn.Click += new System.EventHandler(this.trainBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(542, 320);
+            this.Controls.Add(this.trainBtn);
             this.Controls.Add(this.mainTextBox);
-            this.Controls.Add(this.ResultLabel);
             this.Controls.Add(this.GuessBtn);
             this.Controls.Add(this.ImgLoadBtn);
             this.Controls.Add(this.InputPictureGroupBox);
@@ -128,9 +129,9 @@
         private System.Windows.Forms.GroupBox InputPictureGroupBox;
         private System.Windows.Forms.Button ImgLoadBtn;
         private System.Windows.Forms.Button GuessBtn;
-        private System.Windows.Forms.Label ResultLabel;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.TextBox mainTextBox;
+        private System.Windows.Forms.Button trainBtn;
     }
 }
 
