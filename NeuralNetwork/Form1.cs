@@ -78,16 +78,16 @@ namespace NeuralNetwork
         {
             Dictionary<int, double[]> trainSet = new Dictionary<int, double[]>();
 
-            //trainSet.Add(0, GetArrayOfPixels(Properties.Resources._0));
+            trainSet.Add(0, GetArrayOfPixels(Properties.Resources._0));
             trainSet.Add(1, GetArrayOfPixels(Properties.Resources._1));
             trainSet.Add(2, GetArrayOfPixels(Properties.Resources._2));
-            //trainSet.Add(3, GetArrayOfPixels(Properties.Resources._3));
-            //trainSet.Add(4, GetArrayOfPixels(Properties.Resources._4));
-            //trainSet.Add(5, GetArrayOfPixels(Properties.Resources._5));
-            //trainSet.Add(6, GetArrayOfPixels(Properties.Resources._6));
-            //trainSet.Add(7, GetArrayOfPixels(Properties.Resources._7));
-            //trainSet.Add(8, GetArrayOfPixels(Properties.Resources._8));
-            //trainSet.Add(9, GetArrayOfPixels(Properties.Resources._9));
+            trainSet.Add(3, GetArrayOfPixels(Properties.Resources._3));
+            trainSet.Add(4, GetArrayOfPixels(Properties.Resources._4));
+            trainSet.Add(5, GetArrayOfPixels(Properties.Resources._5));
+            trainSet.Add(6, GetArrayOfPixels(Properties.Resources._6));
+            trainSet.Add(7, GetArrayOfPixels(Properties.Resources._7));
+            trainSet.Add(8, GetArrayOfPixels(Properties.Resources._8));
+            trainSet.Add(9, GetArrayOfPixels(Properties.Resources._9));
 
             return trainSet;
         }
@@ -111,7 +111,7 @@ namespace NeuralNetwork
                     double[] input = GetArrayOfPixels(InputPictureBox.Image);
 
                     if (nn == null)
-                         nn = new NeuralNetwork(15, 2, 2);
+                         nn = new NeuralNetwork(15, 10, 10);
 
                     
                      nn.Run(input);
@@ -130,6 +130,11 @@ namespace NeuralNetwork
         {
             if(nn != null)
                 nn.Train(GetTrainSet());
+            else
+            {
+                nn = new NeuralNetwork(15, 10, 10);
+                nn.Train(GetTrainSet());
+            }
         }
     }
 }
