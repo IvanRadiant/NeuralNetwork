@@ -37,7 +37,7 @@ namespace NeuralNetwork
 
         public static double RoundUp(double number, int digits)
         {
-            double factor = Convert.ToDouble(Math.Pow(10, digits));
+            double factor = Math.Pow(10, digits);
             return Math.Ceiling(number * factor) / factor;
         }
     }
@@ -95,8 +95,10 @@ namespace NeuralNetwork
             {
                 inducedLocalField += weights[i] * input[i];
             }
-            derivativeInducedLocalField = NueralNetworkMath.RoundUp(NueralNetworkMath.SigmoidDX(inducedLocalField),5);
-            inducedLocalField = NueralNetworkMath.RoundUp(NueralNetworkMath.Sigmoid(inducedLocalField),5);
+
+            derivativeInducedLocalField = NueralNetworkMath.SigmoidDX(inducedLocalField);
+            inducedLocalField = NueralNetworkMath.Sigmoid(inducedLocalField);
+
         }
         /// <summary>
         /// Функция возбуждения, активации, активатор, для
@@ -120,6 +122,7 @@ namespace NeuralNetwork
         protected int countOfNeuronsOfPrevLayer;
         protected double[] input;
         protected LayerType layerType;
+        public Layer prevLayer;
         private static Random rnd = new Random();
         double totalError;
 
@@ -147,7 +150,7 @@ namespace NeuralNetwork
             double[] weights = new double[countOfNeuronsOfPrevLayer];
             for (int i = 0; i < countOfNeuronsOfPrevLayer; i++)
             {
-                weights[i] =  NueralNetworkMath.RoundUp(rnd.NextDouble() * (0.0009 - 0.0001) + 0.0001, 5);
+                weights[i] =  rnd.NextDouble() * (0.1 - 0.0000001) + 0.0000001;
             }
             return weights;
         }
@@ -231,20 +234,17 @@ namespace NeuralNetwork
             for(int i = 0; i < neurons.Length; i++)
             {
                 Neuron currentNeuron = neurons[i];
-                currentNeuron.Error = NueralNetworkMath.RoundUp(currentNeuron.DerivativeInducedLocalField * GetTotalError(inputNeurons, i), 5);
+                currentNeuron.Error = currentNeuron.DerivativeInducedLocalField * GetTotalError(inputNeurons, i);
                 for(int j = 0; j < currentNeuron.Weights.Length; j++)
                 {
-                    double DeltaWeights = NueralNetworkMath.RoundUp(_learningRate * currentNeuron.Error * input[j],5);
-                    currentNeuron.Weights[j] = NueralNetworkMath.RoundUp(currentNeuron.Weights[j] + DeltaWeights, 5);
-                    /*if (currentNeuron.Weights[i] >= 1.0)
-                    {
-                        currentNeuron.Weights[i] = 0.999;
-                    }
-                    if (currentNeuron.Weights[i] <= -1.0)
-                    {
-                        currentNeuron.Weights[i] = -0.999;
-                    }*/
+                    double DeltaWeights = _learningRate * currentNeuron.Error * input[j];
+                    currentNeuron.Weights[j] = currentNeuron.Weights[j] + DeltaWeights;
                 }          
+            }
+
+            if(prevLayer as HiddenLayer != null)
+            {
+                (prevLayer as HiddenLayer).CalibrateWeights(neurons, _learningRate);
             }
         }
 
@@ -260,20 +260,12 @@ namespace NeuralNetwork
         public void CalibrateWeights(int _indexOfNeuron, double _error, double _learningRate)
         {
             Neuron currentNeuron = neurons[_indexOfNeuron];
-            currentNeuron.Error = NueralNetworkMath.RoundUp(currentNeuron.DerivativeInducedLocalField * _error, 5);
+            currentNeuron.Error = currentNeuron.DerivativeInducedLocalField * _error;
             
             for(int i = 0; i < currentNeuron.Weights.Length; i++)
             {
-                double DeltaWeights = NueralNetworkMath.RoundUp(_learningRate * currentNeuron.Error * input[i],5);
-                currentNeuron.Weights[i] = NueralNetworkMath.RoundUp(currentNeuron.Weights[i] + DeltaWeights,5);
-               /* if(currentNeuron.Weights[i] >= 1.0 )
-                {
-                    currentNeuron.Weights[i] = 0.999;
-                }
-                if (currentNeuron.Weights[i] <= -1.0)
-                {
-                    currentNeuron.Weights[i] = -0.999;
-                }*/
+                double DeltaWeights = _learningRate * currentNeuron.Error * input[i];
+                currentNeuron.Weights[i] = currentNeuron.Weights[i] + DeltaWeights;
             }
         }
        
@@ -286,7 +278,7 @@ namespace NeuralNetwork
 
         public override string ToString()
         {
-            return String.Format("Вероятность того, что на картинке цифра '{0}' = {1}", Digital, Probability);
+            return String.Format("Вероятность того, что на картинке цифра '{0}' = {1}", Digital, Convert.ToDecimal(Probability));
         }
     }
 
@@ -294,10 +286,11 @@ namespace NeuralNetwork
     {
         InputLayer inputLayer;
         HiddenLayer hiddenLayer;
+        HiddenLayer hiddenLayer2;
         OutputLayer outputLayer;
         Prediction[] output;
         int epochs;
-        double learningRate = 0.1;
+        double learningRate = 0.012;
 
         public InputLayer InputLayer
         {
@@ -320,12 +313,16 @@ namespace NeuralNetwork
             set { epochs = value; }
         }
 
-        public NeuralNetwork(int _countInputLayerNeurons, int _countHiddenLayerNeurons, int _countOutputLayerNeurons, int _epochs = 5000)
+
+        public NeuralNetwork(int _countInputLayerNeurons, int _countHiddenLayerNeurons, int _countOutputLayerNeurons, int _epochs = 10000000)
         {
             inputLayer = new InputLayer(_countInputLayerNeurons, 0, LayerType.Input);
             hiddenLayer = new HiddenLayer(_countHiddenLayerNeurons, _countInputLayerNeurons, LayerType.Hidden);
+            hiddenLayer2 = new HiddenLayer(_countHiddenLayerNeurons, _countHiddenLayerNeurons, LayerType.Hidden);
             outputLayer = new OutputLayer(_countOutputLayerNeurons, _countHiddenLayerNeurons, LayerType.Output);
             epochs = _epochs;
+
+            hiddenLayer2.prevLayer = inputLayer;
         }
 
         public void Train(Dictionary<int, double[]> trainSet)
@@ -362,14 +359,16 @@ namespace NeuralNetwork
         public void Run(double[] input)
         {
             double[] output = outputLayer.GetOutput(
-                                    hiddenLayer.GetOutput(
-                                        inputLayer.GetOutput(input)
+                                    hiddenLayer2.GetOutput(
+                                        hiddenLayer.GetOutput(
+                                            inputLayer.GetOutput(input)
+                                        )
                                     )
                                );
             this.output = new Prediction[output.Length];
             for (int i = 0; i < output.Length; i++)
             {
-                this.output[i] = new Prediction { Digital = i, Probability = output[i] };
+                this.output[i] = new Prediction { Digital = i, Probability = NueralNetworkMath.RoundUp(output[i], 5) };
             }
         }
     }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace NeuralNetwork
 {
@@ -111,12 +112,12 @@ namespace NeuralNetwork
                     double[] input = GetArrayOfPixels(InputPictureBox.Image);
 
                     if (nn == null)
-                         nn = new NeuralNetwork(15, 10, 10);
+                         nn = new NeuralNetwork(15, 100, 10);
 
                     
                      nn.Run(input);
-
-                     DisplayResults(nn.Output);
+                    mainTextBox.Clear();
+                    DisplayResults(nn.Output);
                 }
             }
             catch (Exception error)
@@ -128,13 +129,25 @@ namespace NeuralNetwork
 
         private void trainBtn_Click(object sender, EventArgs e)
         {
-            if(nn != null)
+
+            Stopwatch stw = new Stopwatch();
+            stw.Start();
+            if (nn != null)
+            {
+                stw.Start();
                 nn.Train(GetTrainSet());
+                stw.Stop();
+            }
             else
             {
-                nn = new NeuralNetwork(15, 10, 10);
+                nn = new NeuralNetwork(15, 100, 10);
+                stw.Start();
                 nn.Train(GetTrainSet());
+                stw.Stop();
             }
+            mainTextBox.Text = String.Format("{0} часов, {1} минут", stw.Elapsed.Hours, stw.Elapsed.Minutes);
+            
+
         }
     }
 }
